@@ -68,8 +68,8 @@ class GoogleAuth {
 abstract class _GoogleAuth {
   external Promise<GoogleUser> signIn(
       [dynamic /*SigninOptions|SigninOptionsBuilder*/ options]);
-  external Promise<dynamic /*{code: string}*/ > grantOfflineAccess(
-      [OfflineAccessOptions options]);
+  external Promise<OfflineAccessResponse /*{code: string}*/ >
+      grantOfflineAccess([OfflineAccessOptions options]);
 }
 
 extension GoogleAuthExtensions on GoogleAuth {
@@ -80,12 +80,18 @@ extension GoogleAuthExtensions on GoogleAuth {
     return promiseToFuture(tt.signIn(options));
   }
 
-  Future<dynamic /*{code: string}*/ > grantOfflineAccess(
+  Future<OfflineAccessResponse /*{code: string}*/ > grantOfflineAccess(
       [OfflineAccessOptions options]) {
     final Object t = this;
     final _GoogleAuth tt = t;
     return promiseToFuture(tt.grantOfflineAccess(options));
   }
+}
+
+@JS()
+@anonymous
+abstract class OfflineAccessResponse {
+  external String get code;
 }
 
 @anonymous

@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:html' as html;
 
 import 'package:google_sign_in_platform_interface/google_sign_in_platform_interface.dart';
+import 'package:google_sign_in_platform_interface/src/types.dart';
 
 import 'generated/gapiauth2.dart' as auth2;
 
@@ -32,17 +33,20 @@ Future<void> injectJSLibraries(List<String> libraries,
 /// Utility method that converts `currentUser` to the equivalent
 /// [GoogleSignInUserData].
 /// This method returns `null` when the [currentUser] is not signed in.
-GoogleSignInUserData gapiUserToPluginUserData(auth2.GoogleUser currentUser) {
+Future<GoogleSignInUserData> gapiUserToPluginUserData(
+    auth2.GoogleUser currentUser) async {
   final bool isSignedIn = currentUser?.isSignedIn() ?? false;
   final auth2.BasicProfile profile = currentUser?.getBasicProfile();
+  auth2.OfflineAccessResponse response =
+      await auth2.getAuthInstance().grantOfflineAccess();
   if (!isSignedIn || profile?.getId() == null) {
     return null;
   }
   return GoogleSignInUserData(
-    displayName: profile?.getName(),
-    email: profile?.getEmail(),
-    id: profile?.getId(),
-    photoUrl: profile?.getImageUrl(),
-    idToken: currentUser.getAuthResponse()?.id_token,
-  );
+      displayName: profile?.getName(),
+      email: profile?.getEmail(),
+      id: profile?.getId(),
+      photoUrl: profile?.getImageUrl(),
+      idToken: currentUser.getAuthResponse()?.id_token,
+      serverAuthCode: response.code);
 }
