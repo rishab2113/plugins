@@ -122,7 +122,7 @@ class GoogleSignInPlugin extends GoogleSignInPlatform {
   Future<GoogleSignInUserData> signInSilently() async {
     await initialized;
 
-    return gapiUserToPluginUserData(
+    return gapiUserToPluginUserDataSilent(
         await auth2.getAuthInstance().currentUser.get());
   }
 
@@ -130,7 +130,8 @@ class GoogleSignInPlugin extends GoogleSignInPlatform {
   Future<GoogleSignInUserData> signIn() async {
     await initialized;
     try {
-      return gapiUserToPluginUserData(await auth2.getAuthInstance().signIn());
+      return gapiUserToPluginUserData(await auth2.getAuthInstance().signIn(),
+          await auth2.getAuthInstance().grantOfflineAccess());
     } on auth2.GoogleAuthSignInError catch (reason) {
       throw PlatformException(
         code: reason.error,

@@ -34,11 +34,9 @@ Future<void> injectJSLibraries(List<String> libraries,
 /// [GoogleSignInUserData].
 /// This method returns `null` when the [currentUser] is not signed in.
 Future<GoogleSignInUserData> gapiUserToPluginUserData(
-    auth2.GoogleUser currentUser) async {
+    auth2.GoogleUser currentUser, auth2.OfflineAccessResponse response) async {
   final bool isSignedIn = currentUser?.isSignedIn() ?? false;
   final auth2.BasicProfile profile = currentUser?.getBasicProfile();
-  auth2.OfflineAccessResponse response =
-      await auth2.getAuthInstance().grantOfflineAccess();
   if (!isSignedIn || profile?.getId() == null) {
     return null;
   }
@@ -49,4 +47,22 @@ Future<GoogleSignInUserData> gapiUserToPluginUserData(
       photoUrl: profile?.getImageUrl(),
       idToken: currentUser.getAuthResponse()?.id_token,
       serverAuthCode: response.code);
+}
+
+/// Utility method that converts `currentUser` to the equivalent
+/// [GoogleSignInUserData].
+/// This method returns `null` when the [currentUser] is not signed in.
+Future<GoogleSignInUserData> gapiUserToPluginUserDataSilent(
+    auth2.GoogleUser currentUser) async {
+  final bool isSignedIn = currentUser?.isSignedIn() ?? false;
+  final auth2.BasicProfile profile = currentUser?.getBasicProfile();
+  if (!isSignedIn || profile?.getId() == null) {
+    return null;
+  }
+  return GoogleSignInUserData(
+      displayName: profile?.getName(),
+      email: profile?.getEmail(),
+      id: profile?.getId(),
+      photoUrl: profile?.getImageUrl(),
+      idToken: currentUser.getAuthResponse()?.id_token);
 }
